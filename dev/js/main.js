@@ -19,8 +19,8 @@ var PENDULUM_COLORS = require('./PENDULUM_COLORS');
 
 	//Math.floor(Math.random() * colorNames.length)
 	function flashColor (num) {
-		var newColr = PENDULUM_COLORS[ colorNames[num] ];
-		currentColor  = newColr;
+		//var newColr = PENDULUM_COLORS[ colorNames[num] ];
+		currentColor = PENDULUM_COLORS[ colorNames[num] ];
 		globAlf = 1;
 		alphaVel = 0.04;
 	}
@@ -58,6 +58,8 @@ var PENDULUM_COLORS = require('./PENDULUM_COLORS');
 
 
 	RESIZOR.addHandler(function (wid,hite) {
+		width = window.innerWidth;
+		height = window.innerHeight;
 		canvas.width = wid;
 		canvas.height = hite;
 	});

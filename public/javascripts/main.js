@@ -20,8 +20,8 @@ var PENDULUM_COLORS = require('./PENDULUM_COLORS');
 
 	//Math.floor(Math.random() * colorNames.length)
 	function flashColor (num) {
-		var newColr = PENDULUM_COLORS[ colorNames[num] ];
-		currentColor  = newColr;
+		//var newColr = PENDULUM_COLORS[ colorNames[num] ];
+		currentColor = PENDULUM_COLORS[ colorNames[num] ];
 		globAlf = 1;
 		alphaVel = 0.04;
 	}
@@ -59,6 +59,8 @@ var PENDULUM_COLORS = require('./PENDULUM_COLORS');
 
 
 	RESIZOR.addHandler(function (wid,hite) {
+		width = window.innerWidth;
+		height = window.innerHeight;
 		canvas.width = wid;
 		canvas.height = hite;
 	});
@@ -66,15 +68,20 @@ var PENDULUM_COLORS = require('./PENDULUM_COLORS');
 	if(typeof io === 'function') {
 		var socket = io.connect(window.location.hostname + ":" + window.location.port );
 		socket.on("FLASH", function (num) {
+
 			console.log('received flash message');
+			//sanitize
+			if(isNaN(num)) { num = Math.ceil(Math.random() * 7); }
+			if(num < 1) { num = 1; }
+			if(num > 7) { num = 7; }
+
 			flashColor(num-1);
+
 		});
 	} else {
 		console.warn('no socket io');
 	}
 	
-
-
 	RESIZOR.init();
 	animatr.init();
 
