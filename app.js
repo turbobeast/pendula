@@ -1,6 +1,5 @@
 var express = require('express');
 var app = express();
-//var http = require('http');
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
 var path = require('path');
@@ -11,7 +10,6 @@ var socket = require('socket.io')();
 var sockets = [];
 
 io.on("connection", function (socket) {
-	//sockets.push(socket);
 	console.log("new socket connection");
 });
 
@@ -33,7 +31,7 @@ app.get("/color", function (req,res) {
 
 	console.log(req.query.num);
 	io.sockets.emit("FLASH", req.query.num);
-	res.end();
+	res.send("thanks");
 	
 });
 
