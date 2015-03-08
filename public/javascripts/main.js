@@ -188,9 +188,9 @@ var PenduBlock = function (num) {
 	
 
 	this.fill = PENDULUM_COLORS[ colorNames[num] ];
-	this.height = window.innerHeight;///7;
+	this.height = window.innerHeight/7;
 	this.width = window.innerWidth;
-	this.y = 0;//(window.innerHeight / 7) * num;
+	this.y = (window.innerHeight / 7) * num;
 	this.x = 0;
 	this.alf = 0.0;
 	this.alphaVel = 0;
@@ -203,9 +203,9 @@ PenduBlock.prototype = {
 	
 	resize : function () {
 
-		this.height = window.innerHeight;// /7;
+		this.height = window.innerHeight/7;
 		this.width = window.innerWidth;
-		this.y = 0;//(window.innerHeight / 7) * this.num;
+		this.y = (window.innerHeight / 7) * this.num;
 	},
 
 
