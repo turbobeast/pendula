@@ -2,6 +2,10 @@ var Canvs = require('./canvs');
 var animatr = require('./animatr');
 var RESIZOR = require('./RESIZOR');
 var PENDULUM_COLORS = require('./PENDULUM_COLORS');
+var Pendulu  = require('./Pendulu');
+var Vectr2 = require('vectr2');
+
+
 
 (function () {
 
@@ -16,6 +20,8 @@ var PENDULUM_COLORS = require('./PENDULUM_COLORS');
 	var colorNames = ["ONE", "TWO", "THREE", "FOUR", "FIVE", "SIX", "SEVEN"];
 	var alphaAccel = 0.002;
 	var alphaVel = 0;
+	var amount = 7;
+	var pendulums = [];
 
 	//Math.floor(Math.random() * colorNames.length)
 	function flashColor (num) {
@@ -37,6 +43,27 @@ var PENDULUM_COLORS = require('./PENDULUM_COLORS');
 		
 	}
 
+	function makeNewPend (num) {
+
+		var lengf = (window.innerHeight * 0.3) + (num * 24);
+		var pendu = new Pendulu(new Vectr2(width /2, 40), lengf,  PENDULUM_COLORS[ colorNames[num] ] );
+
+		pendu.onSwitch(function () {
+
+			//blocks[num].flash();
+			//flashColor(num);
+
+		});
+
+		pendulums.push(pendu);
+	}
+
+
+
+	for(var i = 0; i < amount; i += 1) {
+		makeNewPend(i);
+	}
+
 
 	animatr.onFrame(function () {
 
@@ -50,6 +77,11 @@ var PENDULUM_COLORS = require('./PENDULUM_COLORS');
 		context.globalAlpha = globAlf
 		context.fillStyle = currentColor;
 		context.fillRect(0,0,width, height);
+
+		for(i = 0; i < pendulums.length; i += 1) {
+			pendulums[i].swing();
+			//pendulums[i].render(context);
+		}
 
 		context.restore();
 

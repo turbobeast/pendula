@@ -3,6 +3,10 @@ var Canvs = require('./canvs');
 var animatr = require('./animatr');
 var RESIZOR = require('./RESIZOR');
 var PENDULUM_COLORS = require('./PENDULUM_COLORS');
+var Pendulu  = require('./Pendulu');
+var Vectr2 = require('vectr2');
+
+
 
 (function () {
 
@@ -17,6 +21,8 @@ var PENDULUM_COLORS = require('./PENDULUM_COLORS');
 	var colorNames = ["ONE", "TWO", "THREE", "FOUR", "FIVE", "SIX", "SEVEN"];
 	var alphaAccel = 0.002;
 	var alphaVel = 0;
+	var amount = 7;
+	var pendulums = [];
 
 	//Math.floor(Math.random() * colorNames.length)
 	function flashColor (num) {
@@ -38,6 +44,27 @@ var PENDULUM_COLORS = require('./PENDULUM_COLORS');
 		
 	}
 
+	function makeNewPend (num) {
+
+		var lengf = (window.innerHeight * 0.3) + (num * 24);
+		var pendu = new Pendulu(new Vectr2(width /2, 40), lengf,  PENDULUM_COLORS[ colorNames[num] ] );
+
+		pendu.onSwitch(function () {
+
+			//blocks[num].flash();
+			//flashColor(num);
+
+		});
+
+		pendulums.push(pendu);
+	}
+
+
+
+	for(var i = 0; i < amount; i += 1) {
+		makeNewPend(i);
+	}
+
 
 	animatr.onFrame(function () {
 
@@ -51,6 +78,11 @@ var PENDULUM_COLORS = require('./PENDULUM_COLORS');
 		context.globalAlpha = globAlf
 		context.fillStyle = currentColor;
 		context.fillRect(0,0,width, height);
+
+		for(i = 0; i < pendulums.length; i += 1) {
+			pendulums[i].swing();
+			//pendulums[i].render(context);
+		}
 
 		context.restore();
 
@@ -87,7 +119,7 @@ var PENDULUM_COLORS = require('./PENDULUM_COLORS');
 
 
 }());
-},{"./PENDULUM_COLORS":2,"./RESIZOR":3,"./animatr":4,"./canvs":5}],2:[function(require,module,exports){
+},{"./PENDULUM_COLORS":2,"./Pendulu":3,"./RESIZOR":4,"./animatr":5,"./canvs":6,"vectr2":7}],2:[function(require,module,exports){
 var PENDULUM_COLORS = {
 	ONE : 'rgb(243, 122, 162)', //pink
 	TWO : 'rgb(66,222,162)', //green
@@ -102,6 +134,108 @@ module.exports = PENDULUM_COLORS;
 
 //'rgb(23,255,102)'//bright green
 },{}],3:[function(require,module,exports){
+var Vectr2 = require('vectr2');
+
+
+
+
+var Pendulu = function (topPos, leng, fill) {
+
+	this.topPos = topPos; //vectr2
+	this.ballPos = new Vectr2(0,0); //vectr2
+
+	this.armLength = leng || 200;
+	this.fill = fill || 'rgb(90,90,200)';
+	this.aVelocity = 0.0;
+	this.aAccel = 0.0;
+	this.friction = 0.999;
+	this.angle = Math.PI/4;
+
+	this.radius = 40;
+
+	this.side = "left";
+
+};
+
+Pendulu.prototype = {
+
+	switchListeners : [],
+
+	handleSwitch : function () {
+		var i = 0;
+
+		for(i =0; i < this.switchListeners.length; i+= 1) {
+			this.switchListeners[i]();
+		}
+	},
+
+	swing : function () {
+
+		
+		var gravity = 0.4;
+		this.aAccel = (-1 * gravity / this.armLength) * Math.sin(this.angle);
+		this.aVelocity += this.aAccel;
+		this.angle += this.aVelocity;
+		this.aVelocity *= this.friction;
+
+
+		this.ballPos.set(this.armLength * Math.sin(this.angle), this.armLength*Math.cos(this.angle));
+     	this.ballPos.add(this.topPos);
+
+     	if(this.side === "left") {
+     		if(this.angle < 0) {
+     			this.side = "right";
+     			this.handleSwitch();
+     			return;
+     		}
+     	}
+
+     	if(this.side === "right") {
+     		if(this.angle > 0) {
+     			this.side = "left";
+     			this.handleSwitch();
+     		}
+     	}
+
+	},
+
+
+	render : function (ctx) {
+
+		ctx.save();
+		ctx.globalAlpha = 1;
+		ctx.strokeStyle = this.fill;
+		ctx.beginPath();
+		ctx.moveTo(this.topPos.x, this.topPos.y);
+		ctx.lineTo(this.ballPos.x, this.ballPos.y);
+		ctx.stroke();
+		ctx.closePath();
+	
+		ctx.beginPath();
+		ctx.fillStyle = this.fill;
+		ctx.moveTo(this.ballPos.x, this.ballPos.y);
+		ctx.arc(this.ballPos.x, this.ballPos.y, this.radius, 0, Math.PI * 2, false);
+		ctx.fill();
+		ctx.closePath();
+
+		ctx.restore();
+	},
+
+
+	onSwitch : function (funk) {
+
+		if(typeof funk === 'function') {
+			this.switchListeners.push(funk)
+		} else {
+			console.warn("you didnt send a function to onSwitch");
+		}
+		
+	},
+};
+
+
+module.exports = Pendulu;
+},{"vectr2":7}],4:[function(require,module,exports){
 var RESIZOR = (function () {
 	'use strict';
 	var sizor = {},
@@ -161,7 +295,7 @@ var RESIZOR = (function () {
 }());	
 
 module.exports = RESIZOR;
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 var animatr = (function () {
 	var anim = {},
   	paused = false,
@@ -223,7 +357,7 @@ var animatr = (function () {
 
 
 module.exports = animatr;
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 var canvs = function (w, h, tainer, td) {
 	
 	var width = w || window.innerWidth;
@@ -244,4 +378,173 @@ var canvs = function (w, h, tainer, td) {
 
 
 module.exports = canvs
+},{}],7:[function(require,module,exports){
+var vectr2 = function (x,y) {
+
+	this.x = x || 0;
+	this.y = y || 0;
+
+};
+
+vectr2.prototype = {
+
+	constructor : vectr2,
+
+
+	set : function (x,y) {
+		this.x = x;
+		this.y = y;
+
+		return this;
+	},
+
+
+	mag : function () {
+		return Math.sqrt(this.x * this.x + this.y * this.y);
+	},
+
+
+	length : function () {
+		return this.mag();
+	},
+
+
+	add : function (vec) {
+		this.x += vec.x;
+		this.y += vec.y;
+
+		return this;
+	},
+
+
+	subtract : function (vec)  {
+		this.x += -vec.x;
+		this.y += -vec.y;
+
+		return this;
+	},
+
+
+	bisect : function (vec) {
+		return this.unit().add(vec.unit()).setMagnitude(110);
+	},
+
+
+	unit : function () {
+		var magnitood = this.mag();
+		return new vectr2(this.x / magnitood, this.y / magnitood);
+	},
+
+	normalize : function () {
+		var magnitood = this.mag();
+		this.x /= magnitood;
+		this.y /= magnitood;
+
+		return this;
+	},
+
+
+	angle : function (vec) {
+		var adjacent = this.project(vec).mag(),
+		hypoteneuse = this.mag();
+
+		if(hypoteneuse === 0) {
+			return 0;
+		}
+
+		return Math.acos( adjacent / hypoteneuse );
+
+	},
+
+
+	leftNormal : function () {
+		return new vectr2(this.y, -this.x);
+	},
+
+
+	rightNormal : function () {
+		return new vectr2(-this.y, this.x);
+	},
+
+
+	dot : function (vec) {
+		return this.x * vec.x + this.y * vec.y;
+	},
+
+	project : function (vec) {
+		var dotScalar = this.dot(vec) / vec.dot(vec);
+		return new vectr2(vec.x * dotScalar, vec.y * dotScalar);
+	},
+
+
+	perpendicular : function (vec) {
+		var cloney = this.clone(),
+		parallel = this.project(vec);
+
+		return cloney.subtract(parallel);
+	},
+
+
+	multiply : function (scalar) {
+		this.x *= scalar;
+		this.y *= scalar;
+
+		return this;
+	},
+
+
+	setMagnitude : function (scalar) {
+		var unitVec = this.unit();
+
+		this.x = unitVec.x * scalar;
+		this.y = unitVec.y * scalar;
+
+		return this;
+	},
+
+
+
+	max : function (limit) {
+		var currentMag = this.mag();
+		if(currentMag > limit) {
+			this.setMagnitude(limit);
+		}
+
+		return this;
+	},
+
+
+	clear : function () {
+		this.x = 0;
+		this.y = 0;
+
+		return this;
+	},
+
+
+
+	clone : function () {
+		return new vectr2(this.x, this.y);
+	},
+
+
+
+	render : function (startX, startY, ctx, styl) {
+
+		ctx.save();
+		ctx.strokeStyle = styl || 'rgb(255,0,0)';
+		ctx.beginPath();
+		ctx.moveTo(startX, startY);
+		ctx.lineTo(startX - this.x, startY - this.y);
+		ctx.stroke();
+		ctx.closePath();
+		ctx.restore();
+	}
+
+
+};
+
+
+module.exports = vectr2;
+
 },{}]},{},[1]);
