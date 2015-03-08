@@ -17,12 +17,6 @@ var colorNames = require('./ColorNames');
 	var canvas = can.canvas;
 	var amount = 7;
 	var currentBlock = null;
-	// var globAlf = 0;
-	// var blueVal = 0;
-	// var currentColor = PENDULUM_COLORS.ONE;
-	// var colorNames = ["ONE", "TWO", "THREE", "FOUR", "FIVE", "SIX", "SEVEN"];
-	// var alphaAccel = 0.002;
-	// var alphaVel = 0;
 	var pendulums = [];
 	var blocks = [];
 
@@ -42,7 +36,7 @@ var colorNames = require('./ColorNames');
 
 		pendu.onSwitch(function () {
 			//pingServer(num);
-			console.log(num);
+			
 			//blocks[num].flash();
 			//currentBlock = blocks[num];
 		});
@@ -107,16 +101,11 @@ var colorNames = require('./ColorNames');
 			//blocks[i].render(context);
 		}
 		//color
-		// context.globalAlpha = globAlf
-		// context.fillStyle = currentColor;
-		// context.fillRect(0,0,width, height);
 
 		for(i = 0; i < pendulums.length; i += 1) {
-			pendulums[i].swing();
+			//pendulums[i].swing();
 			//pendulums[i].render(context);
 		}
-		// pendu.swing();
-		// pendu.render(context);
 
 		context.restore();
 
@@ -142,7 +131,7 @@ var colorNames = require('./ColorNames');
 		var socket = io.connect(window.location.hostname + ":" + window.location.port );
 		socket.on("FLASH", function (num) {
 
-			console.log('received flash message');
+			
 			//sanitize
 			if(isNaN(num)) { num = Math.ceil(Math.random() * 7); }
 			if(num < 1) { num = 1; }

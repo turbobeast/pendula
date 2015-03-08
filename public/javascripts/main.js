@@ -18,12 +18,6 @@ var colorNames = require('./ColorNames');
 	var canvas = can.canvas;
 	var amount = 7;
 	var currentBlock = null;
-	// var globAlf = 0;
-	// var blueVal = 0;
-	// var currentColor = PENDULUM_COLORS.ONE;
-	// var colorNames = ["ONE", "TWO", "THREE", "FOUR", "FIVE", "SIX", "SEVEN"];
-	// var alphaAccel = 0.002;
-	// var alphaVel = 0;
 	var pendulums = [];
 	var blocks = [];
 
@@ -43,7 +37,7 @@ var colorNames = require('./ColorNames');
 
 		pendu.onSwitch(function () {
 			//pingServer(num);
-			console.log(num);
+			
 			//blocks[num].flash();
 			//currentBlock = blocks[num];
 		});
@@ -108,16 +102,11 @@ var colorNames = require('./ColorNames');
 			//blocks[i].render(context);
 		}
 		//color
-		// context.globalAlpha = globAlf
-		// context.fillStyle = currentColor;
-		// context.fillRect(0,0,width, height);
 
 		for(i = 0; i < pendulums.length; i += 1) {
-			pendulums[i].swing();
+			//pendulums[i].swing();
 			//pendulums[i].render(context);
 		}
-		// pendu.swing();
-		// pendu.render(context);
 
 		context.restore();
 
@@ -143,7 +132,7 @@ var colorNames = require('./ColorNames');
 		var socket = io.connect(window.location.hostname + ":" + window.location.port );
 		socket.on("FLASH", function (num) {
 
-			console.log('received flash message');
+			
 			//sanitize
 			if(isNaN(num)) { num = Math.ceil(Math.random() * 7); }
 			if(num < 1) { num = 1; }
@@ -167,18 +156,31 @@ var colorNames = require('./ColorNames');
 module.exports = ["ONE", "TWO", "THREE", "FOUR", "FIVE", "SIX", "SEVEN"];
 },{}],3:[function(require,module,exports){
 var PENDULUM_COLORS = {
-	ONE : 'rgb(243, 122, 162)', //pink
+	ONE : 'rgb(253,255,102)', ///yellr
+	TWO : 'rgb(6,222,252)', //blue
+	THREE : 'rgb(254,102,212)', ///hot pink
+	FOUR : 'rgb(43, 255, 65)', //green
+	FIVE : 'rgb(254,102,212)', ///hot pink
+	SIX : 'rgb(6,222,252)', //blue
+	SEVEN : 'rgb(253,255,102)' ///yellr
+};
+
+module.exports = PENDULUM_COLORS;
+
+//'rgb(23,255,102)'//bright green
+/*
+ONE : 'rgb(243, 122, 162)', //pink
 	TWO : 'rgb(66,222,162)', //green
 	THREE : 'rgb(6,222,252)', //blue
 	FOUR : 'rgb(193,55,122)', ///magenta
 	FIVE : 'rgb(253,255,102)', ///yellr
 	SIX : 'rgb(151,77,242)', //bright green
 	SEVEN : 'rgb(251,122,12)' //orangw 	
-};
+	*/
 
-module.exports = PENDULUM_COLORS;
+	//rgb(24,112,212); // darker blue
 
-//'rgb(23,255,102)'//bright green
+	//rgb(254,102,212), ///hot pink
 },{}],4:[function(require,module,exports){
 var PENDULUM_COLORS = require('./PENDULUM_COLORS');
 var colorNames = require('./ColorNames');
