@@ -15,7 +15,7 @@ var Pendulu = function (topPos, leng, fill) {
 	this.friction = 0.999;
 	this.angle = Math.PI/4;
 
-	this.radius = 40;
+	this.radius = 20 ;
 
 	this.side = "left";
 
@@ -36,7 +36,7 @@ Pendulu.prototype = {
 	swing : function () {
 
 		
-		var gravity = 0.4;
+		var gravity = 0.6;
 		this.aAccel = (-1 * gravity / this.armLength) * Math.sin(this.angle);
 		this.aVelocity += this.aAccel;
 		this.angle += this.aVelocity;
@@ -67,7 +67,7 @@ Pendulu.prototype = {
 	render : function (ctx) {
 
 		ctx.save();
-		ctx.globalAlpha = 1;
+		ctx.globalAlpha = 0.5;
 		ctx.strokeStyle = this.fill;
 		ctx.beginPath();
 		ctx.moveTo(this.topPos.x, this.topPos.y);

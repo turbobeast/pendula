@@ -16,7 +16,7 @@ var colorNames = require('./ColorNames');
 	var can = new Canvs();
 	var context = can.context;
 	var canvas = can.canvas;
-	var amount = 7;
+	var amount = 6;
 	var currentBlock = null;
 	var pendulums = [];
 	var blocks = [];
@@ -32,21 +32,21 @@ var colorNames = require('./ColorNames');
 
 	function makeNewPend (num) {
 
-		var lengf = (window.innerHeight * 0.3) + (num * 24);
+		var lengf = (window.innerHeight * 0.3) + (num * 12);
 		var pendu = new Pendulu(new Vectr2(width /2, 40), lengf,  PENDULUM_COLORS[ colorNames[num] ] );
 
 		pendu.onSwitch(function () {
 			//pingServer(num);
-			
-			//blocks[num].flash();
-			//currentBlock = blocks[num];
+			console.log('flash ' + num);
+			blocks[num].flash();
+			currentBlock = blocks[num];
 		});
 
 		pendulums.push(pendu);
 	}
 
 	function makeNewBlock (num) {
-		var blok = new PenduBlock(num);
+		var blok = new PenduBlock(num, amount);
 		blocks.push(blok);
 	}
 
@@ -59,26 +59,6 @@ var colorNames = require('./ColorNames');
 		makeNewBlock(i);
 	}
 
-	
-	//Math.floor(Math.random() * colorNames.length)
-	// function flashColor (num) {
-	// 	//var newColr = PENDULUM_COLORS[ colorNames[num] ];
-	// 	currentColor = PENDULUM_COLORS[ colorNames[num] ];
-	// 	globAlf = 1;
-	// 	alphaVel = 0.04;
-	// }
-
-
-	// function fadeAlpha () {
-		
-	// 	alphaVel *= 0.98;
-	// 	//alphaVel += alphaAccel;
-	// 	globAlf -= alphaVel;
-	// 	if(globAlf <= 0) {
-	// 		globAlf = 0;
-	// 	}
-		
-	// }
 
 
 	animatr.onFrame(function () {
@@ -89,7 +69,7 @@ var colorNames = require('./ColorNames');
 		var i = 0;
 
 		//darkness
-		context.globalAlpha = 0.1;
+		context.globalAlpha = 0.06;
 		context.fillStyle = 'rgb(2,4,22)';
 		context.fillRect(0,0,width, height);
 
@@ -104,7 +84,7 @@ var colorNames = require('./ColorNames');
 		//color
 
 		for(i = 0; i < pendulums.length; i += 1) {
-			//pendulums[i].swing();
+			pendulums[i].swing();
 			//pendulums[i].render(context);
 		}
 
@@ -134,12 +114,18 @@ var colorNames = require('./ColorNames');
 
 			
 			//sanitize
-			if(isNaN(num)) { num = Math.ceil(Math.random() * 7); }
+			if(isNaN(num)) { num = Math.ceil(Math.random() * amount); }
 			if(num < 1) { num = 1; }
 			if(num > amount) { num = amount; }
 
-			blocks[num-1].flash();
-			currentBlock = blocks[num-1];
+
+			if(blocks[num-1] !== undefined) {
+				blocks[num-1].flash();
+				currentBlock = blocks[num-1];
+			} else {
+				console.warn('unknown block');
+			}
+	
 			// flashColor(num-1);
 
 		});
@@ -186,17 +172,18 @@ var PENDULUM_COLORS = require('./PENDULUM_COLORS');
 var colorNames = require('./ColorNames');
 
 
-var PenduBlock = function (num) {
+var PenduBlock = function (num, total) {
 	
-
+	this.total = total;
 	this.fill = PENDULUM_COLORS[ colorNames[num] ];
-	this.height = window.innerHeight/7;
+	this.height = window.innerHeight/this.total;
 	this.width = window.innerWidth;
-	this.y = (window.innerHeight / 7) * num;
+	this.y = (window.innerHeight / this.total) * num;
 	this.x = 0;
 	this.alf = 0.0;
 	this.alphaVel = 0;
 	this.num = num;
+
 
 };
 
@@ -205,9 +192,9 @@ PenduBlock.prototype = {
 	
 	resize : function () {
 
-		this.height = window.innerHeight/7;
+		this.height = window.innerHeight/this.total;
 		this.width = window.innerWidth;
-		this.y = (window.innerHeight / 7) * this.num;
+		this.y = (window.innerHeight / this.total) * this.num;
 	},
 
 
@@ -263,7 +250,7 @@ var Pendulu = function (topPos, leng, fill) {
 	this.friction = 0.999;
 	this.angle = Math.PI/4;
 
-	this.radius = 40;
+	this.radius = 20 ;
 
 	this.side = "left";
 
@@ -284,7 +271,7 @@ Pendulu.prototype = {
 	swing : function () {
 
 		
-		var gravity = 0.4;
+		var gravity = 0.6;
 		this.aAccel = (-1 * gravity / this.armLength) * Math.sin(this.angle);
 		this.aVelocity += this.aAccel;
 		this.angle += this.aVelocity;
@@ -315,7 +302,7 @@ Pendulu.prototype = {
 	render : function (ctx) {
 
 		ctx.save();
-		ctx.globalAlpha = 1;
+		ctx.globalAlpha = 0.5;
 		ctx.strokeStyle = this.fill;
 		ctx.beginPath();
 		ctx.moveTo(this.topPos.x, this.topPos.y);
