@@ -37,9 +37,9 @@ var colorNames = require('./ColorNames');
 
 		pendu.onSwitch(function () {
 			//pingServer(num);
-			console.log('flash ' + num);
-			blocks[num].flash();
-			currentBlock = blocks[num];
+			// console.log('flash ' + num);
+			// blocks[num].flash();
+			// currentBlock = blocks[num];
 		});
 
 		pendulums.push(pendu);
@@ -84,7 +84,7 @@ var colorNames = require('./ColorNames');
 		//color
 
 		for(i = 0; i < pendulums.length; i += 1) {
-			pendulums[i].swing();
+			//pendulums[i].swing();
 			//pendulums[i].render(context);
 		}
 
