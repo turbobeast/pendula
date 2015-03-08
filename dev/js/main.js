@@ -19,6 +19,7 @@ var colorNames = require('./ColorNames');
 	var currentBlock = null;
 	var pendulums = [];
 	var blocks = [];
+	var showStarted = false;
 
 	function pingServer (num) {
 
@@ -31,7 +32,7 @@ var colorNames = require('./ColorNames');
 
 	function makeNewPend (num) {
 
-		var lengf = (window.innerHeight * 0.3) + (num * 12);
+		var lengf = (window.innerHeight * 0.3) + (num * 18);
 		var pendu = new Pendulu(new Vectr2(width /2, 40), lengf,  PENDULUM_COLORS[ colorNames[num] ] );
 
 		pendu.onSwitch(function () {
@@ -68,24 +69,29 @@ var colorNames = require('./ColorNames');
 		var i = 0;
 
 		//darkness
-		context.globalAlpha = 0.06;
+		context.globalAlpha = 0.09;
 		context.fillStyle = 'rgb(2,4,22)';
 		context.fillRect(0,0,width, height);
 
-		for(i = 0; i < blocks.length; i += 1) {
-			blocks[i].update();
+		if(showStarted) {
 
-			if(blocks[i] === currentBlock) {
-				blocks[i].render(context);
+			for(i = 0; i < blocks.length; i += 1) {
+				blocks[i].update();
+
+				if(blocks[i] === currentBlock) {
+					blocks[i].render(context);
+				}
 			}
-			//blocks[i].render(context);
-		}
-		//color
 
-		for(i = 0; i < pendulums.length; i += 1) {
-			//pendulums[i].swing();
-			//pendulums[i].render(context);
+		} else {
+
+			for(i = 0; i < pendulums.length; i += 1) {
+				pendulums[i].swing();
+				pendulums[i].render(context);
+			}
+
 		}
+
 
 		context.restore();
 
@@ -111,7 +117,9 @@ var colorNames = require('./ColorNames');
 		var socket = io.connect(window.location.hostname + ":" + window.location.port );
 		socket.on("FLASH", function (num) {
 
-			
+			if(!showStarted) {
+				showStarted = true;
+			}
 			//sanitize
 			if(isNaN(num)) { num = Math.ceil(Math.random() * amount); }
 			if(num < 1) { num = 1; }

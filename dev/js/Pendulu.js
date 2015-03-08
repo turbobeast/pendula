@@ -15,7 +15,7 @@ var Pendulu = function (topPos, leng, fill) {
 	this.friction = 0.999;
 	this.angle = Math.PI/4;
 
-	this.radius = 20 ;
+	this.radius = 30 ;
 
 	this.side = "left";
 
@@ -67,13 +67,13 @@ Pendulu.prototype = {
 	render : function (ctx) {
 
 		ctx.save();
-		ctx.globalAlpha = 0.5;
-		ctx.strokeStyle = this.fill;
-		ctx.beginPath();
-		ctx.moveTo(this.topPos.x, this.topPos.y);
-		ctx.lineTo(this.ballPos.x, this.ballPos.y);
-		ctx.stroke();
-		ctx.closePath();
+		ctx.globalAlpha = 0.7;
+		// ctx.strokeStyle = this.fill;
+		// ctx.beginPath();
+		// ctx.moveTo(this.topPos.x, this.topPos.y);
+		// ctx.lineTo(this.ballPos.x, this.ballPos.y);
+		// ctx.stroke();
+		// ctx.closePath();
 	
 		ctx.beginPath();
 		ctx.fillStyle = this.fill;
