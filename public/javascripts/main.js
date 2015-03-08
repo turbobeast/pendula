@@ -5,43 +5,35 @@ var RESIZOR = require('./RESIZOR');
 var PENDULUM_COLORS = require('./PENDULUM_COLORS');
 var Pendulu  = require('./Pendulu');
 var Vectr2 = require('vectr2');
-
+var PenduBlock = require('./PenduBlock');
+var colorNames = require('./ColorNames');
 
 
 (function () {
-
+	"use strict";
 	var width = window.innerWidth;
 	var height = window.innerHeight;
 	var can = new Canvs();
 	var context = can.context;
 	var canvas = can.canvas;
-	var globAlf = 0;
-	var blueVal = 0;
-	var currentColor = PENDULUM_COLORS.ONE;
-	var colorNames = ["ONE", "TWO", "THREE", "FOUR", "FIVE", "SIX", "SEVEN"];
-	var alphaAccel = 0.002;
-	var alphaVel = 0;
 	var amount = 7;
+	var currentBlock = null;
+	// var globAlf = 0;
+	// var blueVal = 0;
+	// var currentColor = PENDULUM_COLORS.ONE;
+	// var colorNames = ["ONE", "TWO", "THREE", "FOUR", "FIVE", "SIX", "SEVEN"];
+	// var alphaAccel = 0.002;
+	// var alphaVel = 0;
 	var pendulums = [];
+	var blocks = [];
 
-	//Math.floor(Math.random() * colorNames.length)
-	function flashColor (num) {
-		//var newColr = PENDULUM_COLORS[ colorNames[num] ];
-		currentColor = PENDULUM_COLORS[ colorNames[num] ];
-		globAlf = 1;
-		alphaVel = 0.04;
-	}
+	function pingServer (num) {
 
+		var url = "https://pendula.herokuapp.com/color/?num=" + (num +1);
+		var xhr = new XMLHttpRequest();
+		xhr.open("GET", url, true);
+		xhr.send(null);
 
-	function fadeAlpha () {
-		
-		alphaVel *= 0.98;
-		//alphaVel += alphaAccel;
-		globAlf -= alphaVel;
-		if(globAlf <= 0) {
-			globAlf = 0;
-		}
-		
 	}
 
 	function makeNewPend (num) {
@@ -50,39 +42,82 @@ var Vectr2 = require('vectr2');
 		var pendu = new Pendulu(new Vectr2(width /2, 40), lengf,  PENDULUM_COLORS[ colorNames[num] ] );
 
 		pendu.onSwitch(function () {
-
+			//pingServer(num);
+			console.log(num);
 			//blocks[num].flash();
-			//flashColor(num);
-
+			//currentBlock = blocks[num];
 		});
 
 		pendulums.push(pendu);
 	}
 
+	function makeNewBlock (num) {
+		var blok = new PenduBlock(num);
+		blocks.push(blok);
+	}
 
 
 	for(var i = 0; i < amount; i += 1) {
 		makeNewPend(i);
 	}
 
+	for(var i = 0; i < amount; i += 1) {
+		makeNewBlock(i);
+	}
+
+	
+	//Math.floor(Math.random() * colorNames.length)
+	// function flashColor (num) {
+	// 	//var newColr = PENDULUM_COLORS[ colorNames[num] ];
+	// 	currentColor = PENDULUM_COLORS[ colorNames[num] ];
+	// 	globAlf = 1;
+	// 	alphaVel = 0.04;
+	// }
+
+
+	// function fadeAlpha () {
+		
+	// 	alphaVel *= 0.98;
+	// 	//alphaVel += alphaAccel;
+	// 	globAlf -= alphaVel;
+	// 	if(globAlf <= 0) {
+	// 		globAlf = 0;
+	// 	}
+		
+	// }
+
 
 	animatr.onFrame(function () {
 
-		fadeAlpha();
+		//fadeAlpha();
 		context.save();
 
+		var i = 0;
+
 		//darkness
+		context.globalAlpha = 0.1;
 		context.fillStyle = 'rgb(42,2,12)';
 		context.fillRect(0,0,width, height);
+
+		for(i = 0; i < blocks.length; i += 1) {
+			blocks[i].update();
+
+			if(blocks[i] === currentBlock) {
+				blocks[i].render(context);
+			}
+			//blocks[i].render(context);
+		}
 		//color
-		context.globalAlpha = globAlf
-		context.fillStyle = currentColor;
-		context.fillRect(0,0,width, height);
+		// context.globalAlpha = globAlf
+		// context.fillStyle = currentColor;
+		// context.fillRect(0,0,width, height);
 
 		for(i = 0; i < pendulums.length; i += 1) {
 			pendulums[i].swing();
 			//pendulums[i].render(context);
 		}
+		// pendu.swing();
+		// pendu.render(context);
 
 		context.restore();
 
@@ -95,7 +130,14 @@ var Vectr2 = require('vectr2');
 		height = window.innerHeight;
 		canvas.width = wid;
 		canvas.height = hite;
+
+		var i = 0;
+		for(i = 0; i < blocks.length; i += 1) {
+			blocks[i].resize();
+		}
+
 	});
+
 
 	if(typeof io === 'function') {
 		var socket = io.connect(window.location.hostname + ":" + window.location.port );
@@ -105,9 +147,11 @@ var Vectr2 = require('vectr2');
 			//sanitize
 			if(isNaN(num)) { num = Math.ceil(Math.random() * 7); }
 			if(num < 1) { num = 1; }
-			if(num > 7) { num = 7; }
+			if(num > amount) { num = amount; }
 
-			flashColor(num-1);
+			blocks[num-1].flash();
+			currentBlock = blocks[num-1];
+			// flashColor(num-1);
 
 		});
 	} else {
@@ -119,7 +163,9 @@ var Vectr2 = require('vectr2');
 
 
 }());
-},{"./PENDULUM_COLORS":2,"./Pendulu":3,"./RESIZOR":4,"./animatr":5,"./canvs":6,"vectr2":7}],2:[function(require,module,exports){
+},{"./ColorNames":2,"./PENDULUM_COLORS":3,"./PenduBlock":4,"./Pendulu":5,"./RESIZOR":6,"./animatr":7,"./canvs":8,"vectr2":9}],2:[function(require,module,exports){
+module.exports = ["ONE", "TWO", "THREE", "FOUR", "FIVE", "SIX", "SEVEN"];
+},{}],3:[function(require,module,exports){
 var PENDULUM_COLORS = {
 	ONE : 'rgb(243, 122, 162)', //pink
 	TWO : 'rgb(66,222,162)', //green
@@ -133,7 +179,71 @@ var PENDULUM_COLORS = {
 module.exports = PENDULUM_COLORS;
 
 //'rgb(23,255,102)'//bright green
-},{}],3:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
+var PENDULUM_COLORS = require('./PENDULUM_COLORS');
+var colorNames = require('./ColorNames');
+
+
+var PenduBlock = function (num) {
+	
+
+	this.fill = PENDULUM_COLORS[ colorNames[num] ];
+	this.height = window.innerHeight;///7;
+	this.width = window.innerWidth;
+	this.y = 0;//(window.innerHeight / 7) * num;
+	this.x = 0;
+	this.alf = 0.0;
+	this.alphaVel = 0;
+	this.num = num;
+
+};
+
+
+PenduBlock.prototype = {
+	
+	resize : function () {
+
+		this.height = window.innerHeight;// /7;
+		this.width = window.innerWidth;
+		this.y = 0;//(window.innerHeight / 7) * this.num;
+	},
+
+
+	flash : function () {
+
+		this.alf = 1.0;
+		this.alphaVel = 0.04;
+
+	},
+
+
+
+	update : function () {
+
+		this.alphaVel *= 0.98;
+		this.alf -= this.alphaVel;
+		if(this.alf <= 0) {
+			this.alf = 0;
+		}
+
+	},
+
+
+	render : function (ctx) {
+
+		ctx.save();
+		ctx.globalAlpha = this.alf;
+		ctx.fillStyle = this.fill;
+		ctx.fillRect(this.x, this.y, this.width, this.height);
+		ctx.restore();
+
+	}
+
+};
+
+
+module.exports = PenduBlock;
+},{"./ColorNames":2,"./PENDULUM_COLORS":3}],5:[function(require,module,exports){
 var Vectr2 = require('vectr2');
 
 
@@ -235,7 +345,7 @@ Pendulu.prototype = {
 
 
 module.exports = Pendulu;
-},{"vectr2":7}],4:[function(require,module,exports){
+},{"vectr2":9}],6:[function(require,module,exports){
 var RESIZOR = (function () {
 	'use strict';
 	var sizor = {},
@@ -295,7 +405,7 @@ var RESIZOR = (function () {
 }());	
 
 module.exports = RESIZOR;
-},{}],5:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 var animatr = (function () {
 	var anim = {},
   	paused = false,
@@ -357,7 +467,7 @@ var animatr = (function () {
 
 
 module.exports = animatr;
-},{}],6:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 var canvs = function (w, h, tainer, td) {
 	
 	var width = w || window.innerWidth;
@@ -378,7 +488,7 @@ var canvs = function (w, h, tainer, td) {
 
 
 module.exports = canvs
-},{}],7:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 var vectr2 = function (x,y) {
 
 	this.x = x || 0;
