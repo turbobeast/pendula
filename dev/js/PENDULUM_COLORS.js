@@ -1,11 +1,11 @@
 var PENDULUM_COLORS = {
-	ONE : 'rgb(253,255,102)', ///yellr
+	ONE : 'rgb(245, 225, 45)', ///yellr
 	TWO : 'rgb(6,222,252)', //blue
 	THREE : 'rgb(254,102,212)', ///hot pink
 	FOUR : 'rgb(43, 255, 65)', //green
 	FIVE : 'rgb(254,102,212)', ///hot pink
 	SIX : 'rgb(6,222,252)', //blue
-	SEVEN : 'rgb(253,255,102)' ///yellr
+	SEVEN : 'rgb(245, 225, 45)' ///yellr
 };
 
 module.exports = PENDULUM_COLORS;

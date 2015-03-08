@@ -89,7 +89,7 @@ var colorNames = require('./ColorNames');
 
 		//darkness
 		context.globalAlpha = 0.1;
-		context.fillStyle = 'rgb(42,2,12)';
+		context.fillStyle = 'rgb(2,4,22)';
 		context.fillRect(0,0,width, height);
 
 		for(i = 0; i < blocks.length; i += 1) {
